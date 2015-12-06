@@ -70,4 +70,38 @@ public class Controller {
 
     }
 
+    
+    
+    public void atualizarDstat() {
+        String command;
+        command = "sudo dstat -c -m -t 1 2";
+
+        Process proc;
+        try {
+            proc = Runtime.getRuntime().exec(command);
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+
+            String line = "";
+            List<String> vmsInfo = new ArrayList<String>();
+
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+                vmsInfo.add(line);
+            }
+
+            proc.waitFor();
+
+            server = new VM(vmsInfo.get(1));
+
+            vms = new ArrayList<VM>();
+            for (int i = 2; i < vmsInfo.size(); i++) {
+                VM vm = new VM(vmsInfo.get(i));
+                vms.add(vm);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Erro ao tentar Atualizar");
+        }
+    }
 }

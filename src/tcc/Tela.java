@@ -576,6 +576,8 @@ public class Tela extends javax.swing.JFrame {
 
     private void btnExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirActionPerformed
 //        
+        
+        controller.atualizarDstat();
 //        XYSeries serie = new XYSeries("Desempenho");
 //        serie.add(1,1);
 //        serie.add(2,2);
