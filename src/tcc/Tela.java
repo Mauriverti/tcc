@@ -5,10 +5,16 @@
  */
 package tcc;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.HashMap;
 import java.util.Random;
+import java.util.function.Consumer;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.UIManager;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -22,19 +28,35 @@ import org.jfree.data.xy.XYSeriesCollection;
  */
 public class Tela extends javax.swing.JFrame {
 
+    private HashMap<String, Runnable> mapThreads = new HashMap<>();
+    private static final String name = "VM";
+    private static Integer id = 0;
+
     /**
      * Creates new form Tela
      */
     public Tela() {
         initComponents();
+
+//        vmList.addListSelectionListener((ListSelectionEvent e) -> {
+//            VirtualMachineStarter element = (VirtualMachineStarter) vmList.getModel().getElementAt(e.getFirstIndex());
+//            element.setCpuListener((Integer t) -> {
+//                System.out.println("Cpu:" + t);
+//            });
+//
+//            element.setMemoListener(t -> {
+//                System.out.println("Memo:" + t);
+//            });
+//
+//        });
     }
-    
+
     Controller controller = new Controller();
     JButton btn = new JButton();
     final Integer amostras = 50;
     //Integer limiteMaximo = 70;
     //Integer limiteMinimo = 30;
-    
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -94,10 +116,16 @@ public class Tela extends javax.swing.JFrame {
         jTextField13 = new javax.swing.JTextField();
         jLabel25 = new javax.swing.JLabel();
         jButton2 = new javax.swing.JButton();
+        jTeste = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         btnNovo.setText("Novo");
+        btnNovo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNovoActionPerformed(evt);
+            }
+        });
 
         btnExcluir.setText("Excluir");
         btnExcluir.addActionListener(new java.awt.event.ActionListener() {
@@ -527,6 +555,13 @@ public class Tela extends javax.swing.JFrame {
 
         painel.addTab("Propriedades Automáticas", jPanel2);
 
+        jTeste.setText("Teste");
+        jTeste.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTesteActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -545,6 +580,8 @@ public class Tela extends javax.swing.JFrame {
                         .addComponent(btnExcluir)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnAtualizar)
+                        .addGap(61, 61, 61)
+                        .addComponent(jTeste)
                         .addGap(0, 0, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
@@ -554,7 +591,8 @@ public class Tela extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnNovo)
                     .addComponent(btnExcluir)
-                    .addComponent(btnAtualizar))
+                    .addComponent(btnAtualizar)
+                    .addComponent(jTeste))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(painel)
@@ -566,17 +604,18 @@ public class Tela extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAtualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAtualizarActionPerformed
-        
-        System.out.println("Atualizar");
-        
+        atualizar();
+
+    }//GEN-LAST:event_btnAtualizarActionPerformed
+
+    private void atualizar() {
         controller.atualizaLista(this.vmList);
         this.jScrollPane1.updateUI();
-        
-    }//GEN-LAST:event_btnAtualizarActionPerformed
+    }
 
     private void btnExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirActionPerformed
 //        
-        
+
         controller.atualizarDstat();
 //        XYSeries serie = new XYSeries("Desempenho");
 //        serie.add(1,1);
@@ -601,7 +640,7 @@ public class Tela extends javax.swing.JFrame {
 //        
 //        this.pnlDesempenho.add(panel, BorderLayout.CENTER);
 //        this.pnlDesempenho.validate();
-        
+
         XYSeries serieMem = new XYSeries("Memoria");
         serieMem = setaSerie(serieMem, "Memoria", 50, 4);
         XYSeries serieVCPU = new XYSeries("VCPU");
@@ -610,21 +649,18 @@ public class Tela extends javax.swing.JFrame {
         limiteMinimo = setaLimites(limiteMinimo, "Limite Mínimo", 30);
         XYSeries limiteMaximo = new XYSeries("Limite Máximo");
         limiteMaximo = setaLimites(limiteMaximo, "Limite Maximo", 70);
-        
+
         /*serie.add(1, 1);
-        serie.add(2, 2);
-        serie.add(3, 3);
-        serie.add(4, 2);
-        serie.add(5, 1);
+         serie.add(2, 2);
+         serie.add(3, 3);
+         serie.add(4, 2);
+         serie.add(5, 1);
         
-        serie2.add(1, 3);
-        serie2.add(2, 2);
-        serie2.add(3, 1);
-        serie2.add(4, 2);
-        serie2.add(5, 3);*/
-
-        
-
+         serie2.add(1, 3);
+         serie2.add(2, 2);
+         serie2.add(3, 1);
+         serie2.add(4, 2);
+         serie2.add(5, 3);*/
         XYSeriesCollection dataSet = new XYSeriesCollection();
         dataSet.addSeries(serieMem);
         dataSet.addSeries(serieVCPU);
@@ -641,15 +677,13 @@ public class Tela extends javax.swing.JFrame {
 
         ChartPanel panel = new ChartPanel(chart);
 
-
         this.pnlDesempenho.setLayout(new BoxLayout(pnlDesempenho, BoxLayout.LINE_AXIS));
         this.pnlDesempenho.add(panel);
-        
 
         this.pnlDesempenho.revalidate();
-        this.pnlDesempenho.repaint();     
-        
-        
+        this.pnlDesempenho.repaint();
+
+
     }//GEN-LAST:event_btnExcluirActionPerformed
 
     private void jTextField3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField3ActionPerformed
@@ -673,7 +707,7 @@ public class Tela extends javax.swing.JFrame {
         jTextField11.setEnabled(jCheckBox2.isSelected());
         jTextField12.setEnabled(jCheckBox2.isSelected());
         jTextField13.setEnabled(jCheckBox2.isSelected());
-        
+
     }//GEN-LAST:event_jCheckBox2ActionPerformed
 
     private void jTextField9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField9ActionPerformed
@@ -684,30 +718,47 @@ public class Tela extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextField10ActionPerformed
 
+    private void jTesteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTesteActionPerformed
+
+        SQliteJDBC bd = new SQliteJDBC();
+        bd.createDB();
+
+    }//GEN-LAST:event_jTesteActionPerformed
+
+    private void btnNovoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNovoActionPerformed
+
+        VirtualMachineStarter vm = new VirtualMachineStarter();
+        mapThreads.put(name + id++, vm);
+        vm.start();
+
+        atualizar();
+
+    }//GEN-LAST:event_btnNovoActionPerformed
+
     public XYSeries setaLimites(XYSeries serie, String nome, Integer valor) {
         serie = new XYSeries(nome);
-        for (int i = 1; i <= this.amostras; i++ ) {
+        for (int i = 1; i <= this.amostras; i++) {
             serie.add(i, valor);
         }
-        
+
         return serie;
     }
-    
+
     public XYSeries setaSerie(XYSeries serie, String nome, Integer valInicial, Integer alteracao) {
         serie = new XYSeries(nome);
-        
+
         int aux = valInicial;
         for (int i = 1; i <= this.amostras; i++) {
             Random r = new Random();
-            int j = alteracao - r.nextInt(alteracao*2) ;
+            int j = alteracao - r.nextInt(alteracao * 2);
 //            System.out.println(j);
-            aux+=j;
+            aux += j;
             serie.add(i, aux);
         }
-        
+
         return serie;
     }
-    
+
     /**
      * @param args the command line arguments
      */
@@ -718,17 +769,17 @@ public class Tela extends javax.swing.JFrame {
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
         try {
-                for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
             }
-            
+
             //UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             //UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-            
+
         } catch (ClassNotFoundException ex) {
             java.util.logging.Logger.getLogger(Tela.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
@@ -744,7 +795,7 @@ public class Tela extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new Tela().setVisible(true);
-                
+
             }
         });
     }
@@ -788,6 +839,7 @@ public class Tela extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSlider jSlider1;
     private javax.swing.JSlider jSlider2;
+    private javax.swing.JButton jTeste;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField10;
     private javax.swing.JTextField jTextField11;

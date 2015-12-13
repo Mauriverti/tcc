@@ -8,7 +8,9 @@ package tcc;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 
@@ -58,7 +60,7 @@ public class Controller {
 
         DefaultListModel model = new DefaultListModel();
         l.setModel(model);      // limpa os campos, se ja possuir algum
-        
+
         model.addElement(server.getId().toString() + " - " + server.getName());
         l.setModel(model);
         if (vms != null) {
@@ -70,8 +72,6 @@ public class Controller {
 
     }
 
-    
-    
     public void atualizarDstat() {
         String command;
         command = "sudo dstat -c -m -t 1 2";
@@ -103,5 +103,15 @@ public class Controller {
             e.printStackTrace();
             System.out.println("Erro ao tentar Atualizar");
         }
+    }
+
+    void atualizaListaFake(JList vmList, HashMap<String, Runnable> mapThreads) {
+        DefaultListModel model = new DefaultListModel();
+        
+        mapThreads.entrySet().stream().forEach((entry) -> {
+            model.addElement(entry.getValue());
+        });
+        
+        vmList.setModel(model);
     }
 }
