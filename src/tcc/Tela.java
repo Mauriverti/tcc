@@ -5,16 +5,14 @@
  */
 package tcc;
 
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Random;
-import java.util.function.Consumer;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.UIManager;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -70,16 +68,16 @@ public class Tela extends javax.swing.JFrame {
         pnlDesempenho = new javax.swing.JPanel();
         pnlPropriedades = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        vmID = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
-        jSlider1 = new javax.swing.JSlider();
+        vcpuSet = new javax.swing.JSlider();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        jSlider2 = new javax.swing.JSlider();
+        memSet = new javax.swing.JSlider();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        jbApplyChanges = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
@@ -144,6 +142,17 @@ public class Tela extends javax.swing.JFrame {
         vmList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane1.setViewportView(vmList);
 
+        painel.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                painelFocusGained(evt);
+            }
+        });
+        painel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                painelMouseClicked(evt);
+            }
+        });
+
         javax.swing.GroupLayout pnlDesempenhoLayout = new javax.swing.GroupLayout(pnlDesempenho);
         pnlDesempenho.setLayout(pnlDesempenhoLayout);
         pnlDesempenhoLayout.setHorizontalGroup(
@@ -159,17 +168,17 @@ public class Tela extends javax.swing.JFrame {
 
         jLabel1.setText("ID:");
 
-        jTextField1.setEditable(false);
-        jTextField1.setText("1");
-        jTextField1.setToolTipText("");
-        jTextField1.setEnabled(false);
-        jTextField1.setPreferredSize(new java.awt.Dimension(70, 27));
+        vmID.setEditable(false);
+        vmID.setText("1");
+        vmID.setToolTipText("");
+        vmID.setEnabled(false);
+        vmID.setPreferredSize(new java.awt.Dimension(70, 27));
 
         jLabel4.setText("Min");
 
-        jSlider1.setMaximum(4);
-        jSlider1.setMinimum(1);
-        jSlider1.setValue(2);
+        vcpuSet.setMaximum(4);
+        vcpuSet.setMinimum(1);
+        vcpuSet.setValue(2);
 
         jLabel2.setText("VCPU:");
 
@@ -177,15 +186,20 @@ public class Tela extends javax.swing.JFrame {
 
         jLabel5.setText("Max");
 
-        jSlider2.setMaximum(2048);
-        jSlider2.setMinimum(512);
-        jSlider2.setValue(2048);
+        memSet.setMaximum(2048);
+        memSet.setMinimum(512);
+        memSet.setValue(2048);
 
         jLabel6.setText("Memória");
 
         jLabel7.setText("Min");
 
-        jButton1.setText("Aplicar Alterações");
+        jbApplyChanges.setText("Aplicar Alterações");
+        jbApplyChanges.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbApplyChangesActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout pnlPropriedadesLayout = new javax.swing.GroupLayout(pnlPropriedades);
         pnlPropriedades.setLayout(pnlPropriedadesLayout);
@@ -197,14 +211,14 @@ public class Tela extends javax.swing.JFrame {
                         .addContainerGap()
                         .addComponent(jLabel4)
                         .addGap(1, 1, 1)
-                        .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(vcpuSet, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel3))
                     .addGroup(pnlPropriedadesLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jLabel7)
                         .addGap(1, 1, 1)
-                        .addComponent(jSlider2, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(memSet, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel5))
                     .addGroup(pnlPropriedadesLayout.createSequentialGroup()
@@ -214,13 +228,13 @@ public class Tela extends javax.swing.JFrame {
                             .addGroup(pnlPropriedadesLayout.createSequentialGroup()
                                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addComponent(vmID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addGroup(pnlPropriedadesLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(pnlPropriedadesLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jbApplyChanges, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(203, Short.MAX_VALUE))
         );
         pnlPropriedadesLayout.setVerticalGroup(
@@ -229,7 +243,7 @@ public class Tela extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(pnlPropriedadesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(vmID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGroup(pnlPropriedadesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlPropriedadesLayout.createSequentialGroup()
                         .addGap(61, 61, 61)
@@ -239,7 +253,7 @@ public class Tela extends javax.swing.JFrame {
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlPropriedadesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(vcpuSet, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(pnlPropriedadesLayout.createSequentialGroup()
                                 .addGap(25, 25, 25)
                                 .addComponent(jLabel4)))))
@@ -252,12 +266,12 @@ public class Tela extends javax.swing.JFrame {
                         .addComponent(jLabel6)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlPropriedadesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jSlider2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(memSet, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(pnlPropriedadesLayout.createSequentialGroup()
                                 .addGap(25, 25, 25)
                                 .addComponent(jLabel7)))))
                 .addGap(18, 18, 18)
-                .addComponent(jButton1)
+                .addComponent(jbApplyChanges)
                 .addContainerGap(187, Short.MAX_VALUE))
         );
 
@@ -727,13 +741,70 @@ public class Tela extends javax.swing.JFrame {
 
     private void btnNovoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNovoActionPerformed
 
-        VirtualMachineStarter vm = new VirtualMachineStarter();
+        /*VirtualMachineStarter vm = new VirtualMachineStarter();
         mapThreads.put(name + id++, vm);
         vm.start();
 
-        atualizar();
+        atualizar(); */
+        
+        
+        CreateVM createVM = new CreateVM();
+        createVM.setLocationRelativeTo(null);    
+        createVM.setVisible(true);
 
     }//GEN-LAST:event_btnNovoActionPerformed
+
+    private void jbApplyChangesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbApplyChangesActionPerformed
+        
+        Integer vmId = Integer.parseInt(this.vmID.getText());
+        
+        Integer newMemValue = this.memSet.getValue();
+        Integer newVCPUValue = this.vcpuSet.getValue();
+        
+        String memCommand  = "sudo xl mem-set "  + vmId + " " + newMemValue;
+        String vcpuCommand = "sudo xl vcpu-set " + vmId + " " + newVCPUValue;
+        
+        Process memProc;
+        Process vcpuProc;
+        try {
+            memProc = Runtime.getRuntime().exec(memCommand);
+
+            memProc.waitFor();
+            
+            BufferedReader reader = new BufferedReader(new InputStreamReader(memProc.getInputStream()));
+
+            String line = "";
+
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+            
+            
+            
+            
+            vcpuProc = Runtime.getRuntime().exec(vcpuCommand);
+
+            vcpuProc.waitFor();
+            
+            
+        } catch(IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        
+        
+    }//GEN-LAST:event_jbApplyChangesActionPerformed
+
+    private void painelFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_painelFocusGained
+        
+
+        
+    }//GEN-LAST:event_painelFocusGained
+
+    private void painelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_painelMouseClicked
+        
+        vmID.setText("5");
+        
+    }//GEN-LAST:event_painelMouseClicked
 
     public XYSeries setaLimites(XYSeries serie, String nome, Integer valor) {
         serie = new XYSeries(nome);
@@ -792,11 +863,11 @@ public class Tela extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the fonullrm */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Tela().setVisible(true);
-
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            
+            Tela t = new Tela();
+            t.setLocationRelativeTo(null);  
+            t.setVisible(true);
         });
     }
 
@@ -804,7 +875,6 @@ public class Tela extends javax.swing.JFrame {
     private javax.swing.JButton btnAtualizar;
     private javax.swing.JButton btnExcluir;
     private javax.swing.JButton btnNovo;
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JCheckBox jCheckBox2;
@@ -837,10 +907,7 @@ public class Tela extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JSlider jSlider1;
-    private javax.swing.JSlider jSlider2;
     private javax.swing.JButton jTeste;
-    private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField10;
     private javax.swing.JTextField jTextField11;
     private javax.swing.JTextField jTextField12;
@@ -853,9 +920,13 @@ public class Tela extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField7;
     private javax.swing.JTextField jTextField8;
     private javax.swing.JTextField jTextField9;
+    private javax.swing.JButton jbApplyChanges;
+    private javax.swing.JSlider memSet;
     private javax.swing.JTabbedPane painel;
     private javax.swing.JPanel pnlDesempenho;
     private javax.swing.JPanel pnlPropriedades;
+    private javax.swing.JSlider vcpuSet;
+    private javax.swing.JTextField vmID;
     private javax.swing.JList vmList;
     // End of variables declaration//GEN-END:variables
 }
